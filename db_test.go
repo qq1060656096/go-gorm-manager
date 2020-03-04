@@ -1,4 +1,4 @@
-package gorm_manager
+package manager
 
 import (
 	"fmt"
