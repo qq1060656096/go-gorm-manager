@@ -27,10 +27,17 @@ if err == nil {
 ```
 
 ```go
-# go test sql
+# go test mysql sql
 CREATE TABLE `test` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nickname` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+
+
+# go test sqlite sql
+CREATE TABLE "test" (
+  "id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "nickname" text
+);
 ```

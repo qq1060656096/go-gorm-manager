@@ -3,11 +3,12 @@ package gorm_manager
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 	"time"
 )
 
-func TestAll(t *testing.T) {
+func TestNewConnectionManagerForMysql(t *testing.T) {
 	m := NewConnectionManager()
 	dataSourceName := "user:password@/dbname?charset=utf8&parseTime=True&loc=Local"
 	dataSourceName = fmt.Sprintf(
@@ -42,7 +43,7 @@ func TestAll(t *testing.T) {
 		errIsNil = false
 	}
 	assert.Equal(t, true, errIsNil, err)
-	sql := `insert test(nickname) values(?)`
+	sql := `insert into test(nickname) values(?)`
 	db := conn.Exec(sql, fmt.Sprintf("test1.field.value.%s", time.Now().Format("2006-01-02 15:04:05")))
 	assert.Equal(t, int64(1), db.RowsAffected, "test1.insertData.error", db.Error)
 
@@ -53,7 +54,45 @@ func TestAll(t *testing.T) {
 		errIsNil = false
 	}
 	assert.Equal(t, true, errIsNil, err)
-	sql = `insert test(nickname) values(?)`
+	sql = `insert into test(nickname) values(?)`
 	db = conn.Exec(sql, fmt.Sprintf("test2.field.value.%s", time.Now().Format("2006-01-02 15:04:05")))
 	assert.Equal(t, int64(1), db.RowsAffected, "test2.insertData.error", db.Error)
+}
+
+func TestNewConnectionManagerForSqlite(t *testing.T) {
+	dir, _ := os.Getwd()
+	fmt.Println(dir)
+
+	m := NewConnectionManager()
+	dataSourceName := dir + "/tmp/sqlite3.1.db"
+	m.Add("sqlite1", &ConnectionConfig{
+		DatabaseDriverName: DRIVER_SQLITE3,
+		DataSourceName: dataSourceName,
+	})
+
+	dataSourceName = dir + "/tmp/sqlite3.2.db"
+	m.Add("sqlite2", &ConnectionConfig{
+		DatabaseDriverName: DRIVER_SQLITE3,
+		DataSourceName: dataSourceName,
+	})
+
+	conn, err := m.Get("sqlite1").GetGormDB()
+	errIsNil := true
+	if err != nil {
+		errIsNil = false
+	}
+	assert.Equal(t, true, errIsNil, err)
+	sql := `insert into test(nickname) values(?)`
+	db := conn.Exec(sql, fmt.Sprintf("sqlite1.field.value.%s", time.Now().Format("2006-01-02 15:04:05")))
+	assert.Equal(t, int64(1), db.RowsAffected, "sqlite1.insertData.error", db.Error)
+
+	conn, err = m.Get("sqlite2").GetGormDB()
+	errIsNil = true
+	if err != nil {
+		errIsNil = false
+	}
+	assert.Equal(t, true, errIsNil, err)
+	sql = `insert into test(nickname) values(?)`
+	db = conn.Exec(sql, fmt.Sprintf("sqlite2.field.value.%s", time.Now().Format("2006-01-02 15:04:05")))
+	assert.Equal(t, int64(1), db.RowsAffected, "sqlite2.insertData.error", db.Error)
 }
