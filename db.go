@@ -1,4 +1,4 @@
-package manager
+package gormManager
 
 import (
 	"github.com/jinzhu/gorm"
