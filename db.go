@@ -1,12 +1,12 @@
 package gormManager
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -70,18 +70,25 @@ func (m *ConnectionManager) Length() int {
 	return len(m.connList)
 }
 
-func (m *ConnectionManager) Reconnection(name string) (*Connection, error) {
-	con := m.Get(name)
-	if con == nil {
-		return nil, errors.New("gorm_manager.connectionNameNotExist")
+func (m ConnectionManager) String() string {
+	type tmpT struct {
+		HasDB bool
+		ConnConfig ConnectionConfig
 	}
-	db, err := gorm.Open(con.conf.DatabaseDriverName, con.conf.DataSourceName)
-	if err != nil {
-		return nil, err
+	list := make(map[string]tmpT)
+	for k, v := range m.connList {
+		tmp := tmpT{}
+		if v.db != nil {
+			tmp.HasDB = true
+		}
+		tmp.ConnConfig = *v.conf
+		list[k] = tmp
 	}
-	con.db = db
-	return con, nil
+	bytes, _ := json.Marshal(list)
+	return string(bytes)
 }
+
+
 
 func (c *Connection) GetGormDB() (*gorm.DB, error) {
 	if c.db == nil {

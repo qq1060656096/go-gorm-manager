@@ -76,6 +76,8 @@ func TestNewConnectionManagerForSqlite(t *testing.T) {
 		DataSourceName: dataSourceName,
 	})
 
+	assert.Equal(t, 2, m.Length(), "driver.length.func.error")
+
 	conn, err := m.Get("sqlite1").GetGormDB()
 	errIsNil := true
 	if err != nil {
@@ -95,4 +97,6 @@ func TestNewConnectionManagerForSqlite(t *testing.T) {
 	sql = `insert into test(nickname) values(?)`
 	db = conn.Exec(sql, fmt.Sprintf("sqlite2.field.value.%s", time.Now().Format("2006-01-02 15:04:05")))
 	assert.Equal(t, int64(1), db.RowsAffected, "sqlite2.insertData.error", db.Error)
+
+	assert.Less(t, 1, len(m.String()))
 }
