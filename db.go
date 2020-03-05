@@ -1,6 +1,7 @@
 package gormManager
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -48,9 +49,12 @@ func (m *ConnectionManager) Remove(name string) {
 
 func (m *ConnectionManager) Get(name string) *Connection {
 	con, ok := m.connList[name]
+	fmt.Println(name, con, ok, m.connList)
 	if !ok {
 		return nil
 	}
+	fmt.Println(name, con, ok, m.connList)
+
 	return con
 }
 
@@ -62,7 +66,7 @@ func (m *ConnectionManager) Exist(name string) bool {
 	return true
 }
 
-func (m *ConnectionManager) length() int {
+func (m *ConnectionManager) Length() int {
 	return len(m.connList)
 }
 
